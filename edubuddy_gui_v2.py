@@ -1,0 +1,123 @@
+import tkinter as tk
+from tkinter import messagebox, ttk
+import time
+import winsound 
+
+class EduBuddyAppExtended:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("EduBuddy AI - Dynamic Socratic Engine")
+        self.root.geometry("430x700")
+        self.root.configure(bg="#121212")
+        self.root.resizable(False, False)
+        
+        self.current_step = 1
+        self.max_steps = 5
+        self.user_topic = "python"
+        self.difficulty_score = 5
+        self.student_name = ""
+        self.macro_goal = ""
+
+        self.ai_doubts = {
+            "ai": [
+                "Level 1: What is the core difference between Machine Learning and a traditional rule-based Python script?",
+                "Level 2: When training an AI model, why do we split data into training and validation sets?",
+                "Level 3: If an AI model gets 100% accuracy on training data but fails on real world data, what went wrong?",
+                "Level 4: How does a Neural Network node decide to pass information? What is the purpose of an activation function?",
+                "Level 5: In deep learning architectures like Transformers, what exactly does the 'Self-Attention' mechanism do?"
+            ],
+            "python": [
+                "Level 1: Why does a dictionary search run faster than checking a list one item at a time?",
+                "Level 2: What is the spatial complexity when allocating a dynamic hash map versus a fixed array structure?",
+                "Level 3: How do you manage memory collisions when multiple keys resolve to the exact same hash index?",
+                "Level 4: How does Python handle memory allocation under the hood when a dictionary grows past its limits?",
+                "Level 5: Explain how a Python memory pointer moves inside an array structure during index allocation."
+            ]
+        }
+        self.configure_styles()
+        self.show_login_screen()
+
+    def configure_styles(self):
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
+        self.style.configure("Accent.TButton", font=("Helvetica", 11, "bold"), background="#BB86FC", foreground="#121212", borderwidth=0, padding=8)
+        self.style.map("Accent.TButton", background=[('active', '#9A66D8')])
+        self.style.configure("Dark.TButton", font=("Helvetica", 10, "bold"), background="#1E1E1E", foreground="#FFFFFF", borderwidth=0, padding=8)
+        self.style.map("Dark.TButton", background=[('active', '#333333')])
+
+    def play_sound(self, sound_type):
+        try:
+            if sound_type == "click":
+                winsound.Beep(1000, 50)
+            elif sound_type == "success":
+                winsound.Beep(1500, 100)
+            elif sound_type == "alert":
+                winsound.Beep(600, 200)
+        except:
+            pass
+
+    def clrscr(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+    def show_login_screen(self):
+        self.clrscr()
+        brand = tk.Frame(self.root, bg="#1E1E1E", height=120)
+        brand.pack(fill="x", pady=(0, 20))
+        tk.Label(brand, text="⚡ EduBuddy AI", font=("Helvetica", 22, "bold"), fg="#03DAC6", bg="#1E1E1E").pack(pady=(30, 5))
+        
+        form = tk.Frame(self.root, bg="#121212")
+        form.pack(padx=30, fill="x")
+        tk.Label(form, text="Enter Profile Name:", fg="#AAAAAA", bg="#121212", font=("Helvetica", 9, "bold")).pack(anchor="w", pady=5)
+        self.ent_name = tk.Entry(form, bg="#1E1E1E", fg="#FFFFFF", font=("Helvetica", 11), bd=1, relief="solid")
+        self.ent_name.pack(fill="x", ipady=5)
+        self.ent_name.insert(0, "Ananya")
+
+        tk.Label(form, text="Select Target Long-Term Macro Goal:", fg="#AAAAAA", bg="#121212", font=("Helvetica", 9, "bold")).pack(anchor="w", pady=(15,5))
+        self.combo_goal = ttk.Combobox(form, values=["Campus Ready - Backend Engineer", "Data Scientist Trainee"], font=("Helvetica", 10), state="readonly")
+        self.combo_goal.pack(fill="x", ipady=4)
+        self.combo_goal.current(0)
+
+        ttk.Button(self.root, text="INITIALIZE SCHEDULE", style="Accent.TButton", command=self.handle_login).pack(pady=40)
+
+    def handle_login(self):
+        self.student_name = self.ent_name.get().strip()
+        self.macro_goal = self.combo_goal.get()
+        if not self.student_name:
+            self.play_sound("alert")
+            return
+        self.play_sound("success")
+        self.show_verification()
+
+    def show_verification(self):
+        self.clrscr()
+        tk.Label(self.root, text="⏰ 6:00 AM TIMELINE ALIGNMENT", font=("Helvetica", 13, "bold"), fg="#BB86FC", bg="#121212", pady=25).pack()
+        card = tk.Frame(self.root, bg="#1E1E1E", bd=1, relief="solid")
+        card.pack(padx=25, fill="x", pady=10)
+        tk.Label(card, text="📅 Today, 5:00 AM - 6:00 AM\nTask Target: Python Basic Arrays", font=("Helvetica", 11), fg="#FFFFFF", bg="#1E1E1E", justify="left", padx=15, pady=15).pack()
+
+        ttk.Button(self.root, text="YES, COMPLETED", style="Accent.TButton", command=lambda: self.start_check("yes")).pack(pady=10, padx=40, fill="x")
+        ttk.Button(self.root, text="PARTIALLY DONE / SWAPPED TOPIC", style="Dark.TButton", command=lambda: self.start_check("partial")).pack(pady=5, padx=40, fill="x")
+
+    def start_check(self, status):
+        self.play_sound("click")
+        self.clrscr()
+        tk.Label(self.root, text="✍️ SUBMIT CONTENT PORTFOLIO", font=("Helvetica", 12, "bold"), fg="#BB86FC", bg="#121212", pady=20).pack()
+        self.txt_in = tk.Text(self.root, height=7, width=38, bg="#1E1E1E", fg="#FFFFFF", font=("Helvetica", 11), bd=1, relief="solid")
+        self.txt_in.pack(pady=20)
+        
+        if status == "partial":
+            self.txt_in.insert(tk.END, "Actually, I shifted focus to Artificial Intelligence models for a change...")
+        else:
+            self.txt_in.insert(tk.END, "I optimized searching loops by introducing structural hash map key indexes...")
+
+        ttk.Button(self.root, text="START SOCRATIC CHECK", style="Accent.TButton", command=self.evaluate_topic).pack()
+
+    def evaluate_topic(self):
+        raw = self.txt_in.get("1.0", tk.END).lower()
+        self.user_topic = "ai" if ("ai" in raw or "artificial" in raw) else "python"
+        self.current_step = 1
+        self.play_sound("success")
+        from socratic_loop import run_socratic_interaction
+        run_socratic_interaction(self)
+      
